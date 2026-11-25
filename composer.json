@@ -1,0 +1,48 @@
+{
+    "name": "magic/framework",
+    "description": "A small PHP application kernel for personal projects and long-running runtimes.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4 <8.6",
+        "psr/log": "^3.0",
+        "nikic/fast-route": "^1.3",
+        "psr/container": "^2.0",
+        "psr/http-message": "^2.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "psr/http-factory": "^1.1",
+        "ext-pcntl": "*"
+    },
+    "suggest": {
+        "ext-swoole": "Install Swoole to use the Swoole runtime adapter.",
+        "ext-swow": "Install Swow to use the Swow runtime adapter."
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "swoole/ide-helper": "6.2.5",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magic\\": "src/",
+            "App\\": "app/",
+            "Example\\Todo\\": "examples/todo/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Magic\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "lint": "find src app examples tests bootstrap config bin -type f -name '*.php' -print0 | xargs -0 -n1 php -l",
+        "test": "@php vendor/bin/phpunit --colors=always",
+        "test:integration": "MAGIC_REAL_SWOOLE=1 php vendor/bin/phpunit --colors=always tests/RealSwooleIntegrationTest.php",
+        "phpstan": "vendor/bin/phpstan analyse --no-progress",
+        "check": "composer validate --strict && composer lint && composer test && composer phpstan",
+        "console": "php bin/magic"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

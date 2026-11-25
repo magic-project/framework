@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Magic\Console\CommandRunner;
+use Magic\Console\CommandOutput;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+/** @var Magic\Application $app */
+$app = null;
+$exitCode = 0;
+
+try {
+    $app = require dirname(__DIR__) . '/bootstrap/app.php';
+    $app->boot();
+    $exitCode = $app->container()->get(CommandRunner::class)->run($argv, new CommandOutput());
+} catch (Throwable $exception) {
+    if ($app instanceof Magic\Application) {
+        $app->logger()->error('Console bootstrap failed.', ['exception' => $exception]);
+    }
+    fwrite(STDERR, 'Console failed: ' . $exception->getMessage() . PHP_EOL);
+    $exitCode = 1;
+} finally {
+    if ($app instanceof Magic\Application) {
+        try {
+            $app->shutdown();
+        } catch (Throwable $exception) {
+            $app->logger()->error('Application shutdown failed.', ['exception' => $exception]);
+            $exitCode = $exitCode === 0 ? 1 : $exitCode;
+        }
+    }
+}
+
+exit($exitCode);
